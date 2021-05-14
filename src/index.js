@@ -74,14 +74,71 @@ class ComponentOnlyTest extends React.Component {
 		this.setState(state => ({ theme: state.theme === ComponentOnlyThemes.dark ? ComponentOnlyThemes.light : ComponentOnlyThemes.dark }));
 	}
 	render() {
-		console.log(this.state.theme);
 		return (
-			<ThemeContext.Provider value={this.state.theme}>
+			<ComponentOnlyTheme.Provider value={this.state.theme}>
 				<div style={{ marginTop: "2rem" }} className={this.state.theme.class}>
-					ComponentTestOnly
+					ComponentOnlyTest
 					<ComponentOnlyBtn toggleTheme={this.handleThemeToggle}/>
 				</div>
-			</ThemeContext.Provider>
+			</ComponentOnlyTheme.Provider>
+		);
+	}
+}
+
+// Components only test of context (with set function)
+//----------------------------------------------------
+
+const ConsumerTestThemes = {
+	light: { class: 'light' },
+	dark: { class: 'dark' },
+}
+const ConsumerTestTheme = React.createContext({
+	theme: ConsumerTestThemes.light,
+	toggler: () => { }
+});
+
+class ConsumerBtn extends React.Component {
+	render() {
+		return (
+			<ConsumerTestTheme.Consumer>
+				{({theme, toggler}) => {
+					console.log("Theme recieved ", theme, toggler);
+					return (
+						<React.Fragment>
+							<br />						
+							<span style={{ cursor: "pointer", border: "1px solid red", marginTop: "1rem", display: "inline-block" }} onClick={toggler}>
+								Toggle this section theme (actually {theme.class})
+							</span>
+						</React.Fragment>
+					)
+				}}
+			</ConsumerTestTheme.Consumer>
+		);
+	}
+}
+class ComponentOnlyBISTest extends React.Component {
+	static contextType = ConsumerTestTheme;
+	constructor() {
+		super();
+		this.handleThemeToggle = this.handleThemeToggle.bind(this);
+		this.state = {
+			themeData: {
+				theme: ConsumerTestThemes.dark,
+				toggler: this.handleThemeToggle
+			}
+		};
+	}
+	handleThemeToggle() {
+		this.setState(state => ({ themeData: {...state.themeData, theme: state.themeData.theme === ConsumerTestThemes.dark ? ConsumerTestThemes.light : ConsumerTestThemes.dark }}));
+	}
+	render() {
+		return (
+			<ConsumerTestTheme.Provider value={this.state.themeData}>
+				<div style={{ marginTop: "2rem" }} className={this.state.themeData.theme.class}>
+					ComponentOnlyBISTest
+					<ConsumerBtn />
+				</div>
+			</ConsumerTestTheme.Provider>
 		);
 	}
 }
@@ -103,6 +160,7 @@ function LazyTest() {
 				</div>
 			</ThemeContext.Provider>
 			<ComponentOnlyTest />
+			<ComponentOnlyBISTest />
 		</div>
 	);
 }
