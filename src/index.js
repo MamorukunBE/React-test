@@ -144,16 +144,37 @@ class ComponentOnlyBISTest extends React.Component {
 
 // Forwarding ref
 //---------------
-class FancySpanClass extends React.Component {
+
+class FancySpanComponent extends React.Component {
 	render() {
 		return (
-			<span ref={this.props.innerRef} className={this.props.className}>
-				{ this.props.children }
-			</span>
+			<ThemeContext.Consumer>
+				{themeHook => {
+					return (
+						<span ref={this.props.innerRef} className={this.props.className + " " + themeHook[0] }>
+							{ this.props.children }
+							<div style={{ textAlign: "center" }}>rand: {this.props.randomData}</div>
+						</span>
+					)
+				}}
+			</ThemeContext.Consumer>
 		);
 	}
 }
-const FancySpan = React.forwardRef((props, ref) => <FancySpanClass innerRef={ref} {...props} />);
+function propsLoggerWrapper(ClassToLog) {
+	return class PropsLogger extends React.Component {
+		componentDidUpdate(prevProps) {
+			console.log("(Logger) Previous:", prevProps);
+			console.log("(Logger) New:", this.props);
+		}
+		render() {
+			return <ClassToLog innerRef={this.ref} {...this.props} />;
+		}
+	}
+};
+// Use a tmp object to prevent recreating it each React.forwardRef() call, thus dismounting and remonting the component at every rerender
+const FancySpanTemp = propsLoggerWrapper(FancySpanComponent);
+const FancySpan = React.forwardRef((props, ref) => <FancySpanTemp innerRef={ref} {...props} />);
 class RefForwarder extends React.Component {
 	constructor() {
 		super();
@@ -166,7 +187,7 @@ class RefForwarder extends React.Component {
 	render() {
 		return (
 			<div>
-				<FancySpan ref={this.btnRef} className="fancy">
+				<FancySpan ref={this.btnRef} className="fancy" randomData={Math.floor(Math.random() * 100)}>
 					My fancy span
 				</FancySpan>
 				<button onClick={this.handleRandomizerClick}>
@@ -192,10 +213,10 @@ function LazyTest() {
 						<InnerContent />
 					</Suspense>
 				</div>
+				<RefForwarder />
 			</ThemeContext.Provider>
 			<ComponentOnlyTest />
 			<ComponentOnlyBISTest />
-			<RefForwarder />
 		</div>
 	);
 }
