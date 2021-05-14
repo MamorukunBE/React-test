@@ -149,7 +149,7 @@ class FancySpanComponent extends React.Component {
 	render() {
 		return (
 			<ThemeContext.Consumer>
-				{themeHook => {
+				{ themeHook => {
 					return (
 						<span ref={this.props.innerRef} className={this.props.className + " " + themeHook[0] }>
 							{ this.props.children }
@@ -161,20 +161,24 @@ class FancySpanComponent extends React.Component {
 		);
 	}
 }
+// HOC wrapper
+// 1) need a const instantiation to update during each rerendering (else is it fully recreated)
+// 2) il parent pass a ref, have to pass it by calling React.forwardRef, and not only the wrapper class
 function propsLoggerWrapper(ClassToLog) {
-	return class PropsLogger extends React.Component {
+	class PropsLogger extends React.Component {
 		componentDidUpdate(prevProps) {
 			console.log("(Logger) Previous:", prevProps);
 			console.log("(Logger) New:", this.props);
 		}
 		render() {
-			return <ClassToLog innerRef={this.ref} {...this.props} />;
+			return <ClassToLog innerRef={this.props.innerRef} {...this.props} />;
 		}
 	}
+	PropsLogger.displayName = "PropsLogger(" + (ClassToLog.displayName || ClassToLog.name || 'Component') + ")";
+
+	return React.forwardRef((props, ref) => <PropsLogger innerRef={ref} {...props} />);
 };
-// Use a tmp object to prevent recreating it each React.forwardRef() call, thus dismounting and remonting the component at every rerender
-const FancySpanTemp = propsLoggerWrapper(FancySpanComponent);
-const FancySpan = React.forwardRef((props, ref) => <FancySpanTemp innerRef={ref} {...props} />);
+const FancySpan = propsLoggerWrapper(FancySpanComponent);
 class RefForwarder extends React.Component {
 	constructor() {
 		super();
