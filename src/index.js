@@ -102,7 +102,6 @@ class ConsumerBtn extends React.Component {
 		return (
 			<ConsumerTestTheme.Consumer>
 				{({theme, toggler}) => {
-					console.log("Theme recieved ", theme, toggler);
 					return (
 						<React.Fragment>
 							<br />						
@@ -143,6 +142,41 @@ class ComponentOnlyBISTest extends React.Component {
 	}
 }
 
+// Forwarding ref
+//---------------
+class FancySpanClass extends React.Component {
+	render() {
+		return (
+			<span ref={this.props.innerRef} className={this.props.className}>
+				{ this.props.children }
+			</span>
+		);
+	}
+}
+const FancySpan = React.forwardRef((props, ref) => <FancySpanClass innerRef={ref} {...props} />);
+class RefForwarder extends React.Component {
+	constructor() {
+		super();
+		this.btnRef = React.createRef();
+		this.handleRandomizerClick = this.handleRandomizerClick.bind(this);
+	}
+	handleRandomizerClick() {
+		this.btnRef.current.style.backgroundColor = "rgb(" + (Math.random() * 256) + "," + (Math.random() * 256) + "," + (Math.random() * 256) + ")";
+	}
+	render() {
+		return (
+			<div>
+				<FancySpan ref={this.btnRef} className="fancy">
+					My fancy span
+				</FancySpan>
+				<button onClick={this.handleRandomizerClick}>
+					Change ref color
+				</button>
+			</div>
+		);
+	}
+}
+
 // Bootstrap
 //----------
 
@@ -161,6 +195,7 @@ function LazyTest() {
 			</ThemeContext.Provider>
 			<ComponentOnlyTest />
 			<ComponentOnlyBISTest />
+			<RefForwarder />
 		</div>
 	);
 }

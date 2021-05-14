@@ -1,3 +1,4 @@
 body { margin: 0; }
 .light { background-color: lightgoldenrodyellow;}
 .dark { background-color: darkslategrey;}
+.fancy { display: inline-block; margin: 10px 20px; padding: 5px 10px; }
