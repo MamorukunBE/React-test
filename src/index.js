@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+
 import React, { Suspense, Profiler } from 'react';
 import ReactDOM from 'react-dom';
 import AppTheme from './colors';
@@ -177,7 +179,7 @@ function propsLoggerWrapper(ClassToLog) {
 	PropsLogger.displayName = "PropsLogger(" + (ClassToLog.displayName || ClassToLog.name || 'Component') + ")";
 
 	return React.forwardRef((props, ref) => <PropsLogger innerRef={ref} {...props} />);
-};
+}
 const FancySpan = propsLoggerWrapper(FancySpanComponent);
 class RefForwarder extends React.Component {
 	constructor() {
