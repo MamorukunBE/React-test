@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, Profiler } from 'react';
 import ReactDOM from 'react-dom';
 import AppTheme from './colors';
 import "./test.css";
@@ -209,6 +209,9 @@ const LazyComponent = React.lazy(() => { return (new Promise((resolve) => setTim
 
 function LazyTest() {
 	const themeHook = React.useState("light");
+	function ProfilerUpdated(...args) {
+		console.log("Rendering time: " + args[2]);
+	}
 	return (
 		<div>
 			<ThemeContext.Provider value={themeHook}>
@@ -219,8 +222,10 @@ function LazyTest() {
 				</div>
 				<RefForwarder />
 			</ThemeContext.Provider>
-			<ComponentOnlyTest />
-			<ComponentOnlyBISTest />
+			<Profiler id="TestProfiler" onRender={ProfilerUpdated}>
+				<ComponentOnlyTest />
+				<ComponentOnlyBISTest />
+			</Profiler>
 		</div>
 	);
 }
