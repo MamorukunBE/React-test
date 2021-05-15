@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 
-import React, { Suspense, Profiler } from 'react';
+import React, { Suspense, Profiler, useState } from 'react';
 import ReactDOM from 'react-dom';
-import AppTheme from './colors';
+import { AppTheme, UseContextTheme } from './colors';
 import "./test.css";
 
 // Test of context using a hook
@@ -204,6 +204,22 @@ class RefForwarder extends React.Component {
 	}
 }
 
+// Context hook in functionnal component
+//--------------------------------------
+
+const HookContext = React.createContext({ selectedTheme: UseContextTheme.light, themeSetter: () => {} });
+
+function ContextHookInfo(props) {
+	const themeContext = React.useContext(HookContext);		// useContext hook testing without the need of a provider
+	return (
+		<div style={{border: "1px solid black", margin: "10px"}}>
+			<p style={themeContext.selectedTheme.style}>Hook {props.name} theme color is {themeContext.selectedTheme.name}</p>
+			<p>{props.comment}</p>
+			<button onClick={() => themeContext.themeSetter(themeContext.selectedTheme === UseContextTheme.light ? UseContextTheme.dark : UseContextTheme.light) }>Change hook theme</button>
+		</div>
+	);
+}
+
 // Bootstrap
 //----------
 
@@ -211,6 +227,7 @@ const LazyComponent = React.lazy(() => { return (new Promise((resolve) => setTim
 
 function LazyTest() {
 	const themeHook = React.useState("light");
+	const [useContextSelectedTheme, useContextThemeSetter] = useState(UseContextTheme.dark);
 	function ProfilerUpdated(...args) {
 		console.log("Rendering time: " + args[2]);
 	}
@@ -227,6 +244,10 @@ function LazyTest() {
 			<Profiler id="TestProfiler" onRender={ProfilerUpdated}>
 				<ComponentOnlyTest />
 				<ComponentOnlyBISTest />
+				<HookContext.Provider value={{ selectedTheme: useContextSelectedTheme, themeSetter: useContextThemeSetter}}>
+					<ContextHookInfo name="with provider" comment="will take the provider value and will be able to change it" />
+				</HookContext.Provider>
+				<ContextHookInfo name="without provider" comment="Will take the context default value and won't be about to change it" />
 			</Profiler>
 		</div>
 	);
