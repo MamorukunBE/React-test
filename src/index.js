@@ -14,14 +14,11 @@ class ThemeToggler extends React.Component {
 	static ownStyle = { cursor: "pointer", border: "1px solid red" };
 	constructor(props) {
 		super(props);		
-		this.handleToggle = this.handleToggle.bind(this);
-	}
-	componentDidMount() {
-		this.themeToggler = this.context[1];
+		this.handleToggle = this.handleToggle.bind(this);		
 	}
 	handleToggle() { this.themeToggler(this.themeColor === "light" ? "dark" : "light"); }
 	render() {
-		this.themeColor = this.context[0];
+		[this.themeColor, this.themeToggler] = this.context;
 		return (<span style={ThemeToggler.ownStyle} onClick={this.handleToggle}>Toggle actuel {this.themeColor} theme</span>); }
 }
 class InnerContent extends React.Component {
