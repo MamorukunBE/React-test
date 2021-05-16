@@ -216,6 +216,10 @@ function ContextHookInfo(props) {
 			null :
 			(<button onClick={() => setParentStateData(!parentStateData)}>Change parrent other hook ({parentStateData ? "true" : "false"})</button>)
 	);
+	React.useEffect(() => {
+		console.log(1);
+		document.title = themeContext.selectedTheme.name;
+	}, [themeContext.selectedTheme]);
 	return (
 		<div style={{border: "1px solid black", margin: "10px"}}>
 			<p style={themeContext.selectedTheme.style}>Hook {props.name} theme color is {themeContext.selectedTheme.name}</p>
